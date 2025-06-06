@@ -30,14 +30,6 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Array of vertices for the isoscoles triangle
-	GLfloat vertices[] =
-	{
-		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-		0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-		0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f
-	};
-
 	// Create a window
 	GLFWwindow* window = glfwCreateWindow(800, 800, "YoutubeOpenGL", NULL, NULL);
 
@@ -48,6 +40,7 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+
 
 	// Assign the window to the OpenGL context
 	glfwMakeContextCurrent(window);
@@ -88,7 +81,26 @@ int main()
 	glDeleteShader(fragmentShader);
 
 
-	GLuint VAO, VBO;
+	// Array of vertices for the equilateral triangles
+	GLfloat vertices[] =
+	{
+		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,	// Bottom Left 
+		0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,		// Bottom Right
+		0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f,	// Top
+		-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Middle Left
+		0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,		// Middle Right
+		0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f	// Middle Bottom
+	};
+
+	// Indices representing each triangle
+	GLuint indices[] =
+	{
+		0, 3, 5,	// Lower left triangle
+		3, 2, 4,	// Lower right triangle
+		5, 4, 1		// Upper triangle
+	};
+
+	GLuint VAO, VBO, EBO;
 
 	// VAO must be before VBO
 
@@ -102,6 +114,9 @@ int main()
 	// Creates 1 vertex buffer object, and stores the name in VBO
 	glGenBuffers(1, &VBO);
 
+	// Creates 1 element-array buffer object
+	glGenBuffers(1, &EBO);
+
 	// Assign VAO to the GL global vertex array object
 	glBindVertexArray(VAO);
 	// Assign VBO as the vertex buffer object
@@ -111,6 +126,10 @@ int main()
 	// Stream - Modified once, used a few times
 	// Dynamic - Modified multiple times, modified many times
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	// Bind EBO and define characteristics
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Defines the vertex attribute at index 0 as 
 	// 3 points, of type float, to not be normalised when accessed,
@@ -123,6 +142,8 @@ int main()
 	// Binds OpenGL's VBO and VAO to 0 so they cant be accidentally modified
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	// Must be after VAO as the EBO is stored in the VAO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// While window hasn't been closed
 	while (!glfwWindowShouldClose(window))
@@ -135,8 +156,8 @@ int main()
 		glUseProgram(shaderProgram);
 		// Bind VAO so OpenGL uses it
 		glBindVertexArray(VAO);
-		// Draw triangle primative using 3 vertices
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// Draw triangles using 9 vertices according to element array buffer
+		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 		// Swap back and front buffer
 		glfwSwapBuffers(window);
 		// Take care of all glfw events
@@ -146,6 +167,7 @@ int main()
 	// Delete vartex arrays, buffer arrays and shader program
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	glDeleteProgram(shaderProgram);
 
 	// Destroy window and terminate glfw before closing
