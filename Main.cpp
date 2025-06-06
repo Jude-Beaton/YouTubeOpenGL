@@ -84,20 +84,17 @@ int main()
 	// Array of vertices for the equilateral triangles
 	GLfloat vertices[] =
 	{
-		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,	// Bottom Left 
-		0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,		// Bottom Right
-		0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f,	// Top
-		-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Middle Left
-		0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,		// Middle Right
-		0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f	// Middle Bottom
+		-0.5f, -0.5f, 0.0f,	// Bottom Left 
+		0.5f, -0.5f, 0.0f,	// Bottom Right
+		-0.5f, 0.5f, 0.0f,	// Top Left 
+		0.5f, 0.5f, 0.0f,	// Top Right
 	};
 
 	// Indices representing each triangle
 	GLuint indices[] =
 	{
-		0, 3, 5,	// Lower left triangle
-		3, 2, 4,	// Lower right triangle
-		5, 4, 1		// Upper triangle
+		2, 0, 1,	// Lower left triangle
+		2, 1, 3	// Upper right triangle
 	};
 
 	GLuint VAO, VBO, EBO;
@@ -157,7 +154,7 @@ int main()
 		// Bind VAO so OpenGL uses it
 		glBindVertexArray(VAO);
 		// Draw triangles using 9 vertices according to element array buffer
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		// Swap back and front buffer
 		glfwSwapBuffers(window);
 		// Take care of all glfw events
