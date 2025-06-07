@@ -10,12 +10,12 @@
 // Array of vertices for the equilateral triangles
 GLfloat vertices[] =
 {
-	-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,	// Bottom Left 
-	0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,		// Bottom Right
-	0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f,	// Top
-	-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Middle Left
-	0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,		// Middle Right
-	0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f	// Middle Bottom
+	-0.5f, -0.5f * float(sqrt(3)) / 3,	   0.0f,	0.8f, 0.3f,  0.02f,	// Bottom Left 
+	 0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,	0.8f, 0.3f,  0.02f,	// Bottom Right
+	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,	1.0f, 0.6f,  0.32f,	// Top
+	-0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,	0.9f, 0.45f, 0.17f,	// Middle Left
+	 0.25f, 0.5f * float(sqrt(3)) / 6,	   0.0f,	0.9f, 0.45f, 0.17f,	// Middle Right
+	 0.0f, -0.5f * float(sqrt(3)) / 3,	   0.0f,	0.8f, 0.3f,  0.02f	// Middle Bottom
 };
 
 // Indices representing each triangle
@@ -67,10 +67,14 @@ int main()
 	VBO VBO1(vertices, sizeof(vertices));
 	EBO EBO1(indices, sizeof(indices));
 
-	VAO1.LinkVBO(VBO1, 0);
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
+
+	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 	// While window hasn't been closed
 	while (!glfwWindowShouldClose(window))
@@ -81,6 +85,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		// Specify shader program to use
 		shaderProgram.Activate();
+		glUniform1f(uniID, 0.5f);
 		// Bind VAO so OpenGL uses it
 		VAO1.Bind();
 		// Draw triangles using 9 vertices according to element array buffer
