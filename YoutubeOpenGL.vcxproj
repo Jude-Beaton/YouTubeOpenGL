@@ -72,7 +72,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>D:\Documents\Coding\C++\OpenGL\YoutubeOpenGL\Libraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Documents\Coding\C++\OpenGL\YoutubeOpenGL\Libraries\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Users\judea\Documents\Coding\c++\YouTubeOpenGL\Libraries\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\judea\Documents\Coding\c++\YouTubeOpenGL\Libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -82,7 +81,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>D:\Documents\Coding\C++\OpenGL\YoutubeOpenGL\Libraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Documents\Coding\C++\OpenGL\YoutubeOpenGL\Libraries\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Users\judea\Documents\Coding\c++\YouTubeOpenGL\Libraries\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\judea\Documents\Coding\c++\YouTubeOpenGL\Libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
