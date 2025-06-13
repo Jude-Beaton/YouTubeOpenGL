@@ -13,17 +13,17 @@
 GLfloat vertices[] =
 {
 	//   COORDINATES	   /		COLOURS			/	TEXTURE COORDS
-	-0.5f, -0.5f,  0.0f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		// Bottom Left
-	-0.5f,  0.5f,  0.0f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		// Bottom Right
-	 0.5f,  0.5f,  0.0f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		// Top Right
-	 0.5f, -0.5f,  0.0f,		1.0f, 1.0f, 1.0f,		1.0f, 0.0f,		// Top Left
+	-0.5f, -0.5f,  0.0f,		1.0f, 0.0f, 0.0f,		-2.0f, -1.0f,		// Bottom Left
+	 0.0f,  0.5f,  0.0f,		0.0f, 1.0f, 0.0f,		-0.5f,  2.0f,		// Bottom Right
+	 0.5f, -0.5f,  0.0f,		0.0f, 0.0f, 1.0f,		 1.0f, -1.0f,		// Top Right
+	 //0.5f, -0.5f,  0.0f,		1.0f, 1.0f, 1.0f,		 2.0f, -1.0f,		// Top Left
 };
 
 // Indices representing each triangle
 GLuint indices[] =
 {
 	0, 2, 1,	// Upper triangle
-	0, 3, 2,	// Lower triangle
+	//0, 3, 2,	// Lower triangle
 };  
 
 
@@ -95,7 +95,7 @@ int main()
 		// Bind VAO so OpenGL uses it
 		VAO1.Bind();
 		// Draw triangles using 9 vertices according to element array buffer
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 		// Swap back and front buffer
 		glfwSwapBuffers(window);
 		// Take care of all glfw events
