@@ -99,11 +99,16 @@ int main()
 	Texture popCat("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	popCat.texUnit(shaderProgram, "tex0", 0);
 
+	// Variable to store rotation of object
+	float rotation = 0.0f;
 
+	// Variable to store time of last roation made
+	double prevTime = glfwGetTime();
 
 	// Turn on depth testing for the faces drawn of the object
 	glEnable(GL_DEPTH_TEST);
 
+	// Initialise camera
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 
@@ -117,8 +122,25 @@ int main()
 		// Specify shader program to use
 		shaderProgram.Activate();
 
+		double crntTime = glfwGetTime();
+		if (crntTime - prevTime >= 1.0f / 60.0f)
+		{
+			rotation += 0.5f;
+			prevTime = crntTime;
+		}
 
+		glm::mat4 model = glm::mat4(1.0f);
+
+		// Rotate the model matrix
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		// Pass the matrices into the shader using the uniforms
+		int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		// Recieve inputs
 		camera.Inputs(window);
+		// Convert coords to the projection
 		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
 
 
