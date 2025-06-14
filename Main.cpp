@@ -2,6 +2,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Texture.h"
 #include "shaderClass.h"
@@ -9,21 +12,30 @@
 #include "VBO.h"
 #include "EBO.h"
 
+const unsigned int width = 800;
+const unsigned int height = 800;
+
 // Array of vertices for the equilateral triangles
 GLfloat vertices[] =
 {
-	//   COORDINATES	   /		COLOURS			/	TEXTURE COORDS
-	-0.5f, -0.5f,  0.0f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		// Bottom Left
-	-0.5f,  0.5f,  0.0f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		// Bottom Right
-	 0.5f,  0.5f,  0.0f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		// Top Right
-	 0.5f, -0.5f,  0.0f,		1.0f, 1.0f, 1.0f,		1.0f, 0.0f,		// Top Left
+	//   COORDINATES	   /			COLOURS			/	TEXTURE COORDS
+	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,		
+	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,		
+	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,		
+	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,		
+	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,		
+
 };
 
 // Indices representing each triangle
 GLuint indices[] =
 {
-	0, 2, 1,	// Upper triangle
-	0, 3, 2,	// Lower triangle
+	0, 1, 2,
+	0, 2, 3,
+	0, 1, 4,
+	1, 2, 4,
+	2, 3, 4,
+	3, 0, 4,
 };  
 
 
@@ -38,7 +50,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create a window
-	GLFWwindow* window = glfwCreateWindow(800, 800, "YoutubeOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "YoutubeOpenGL", NULL, NULL);
 
 	// If window has not been created close the program
 	if (window == NULL)
@@ -57,29 +69,43 @@ int main()
 
 	// Specify viewport of OpenGL in the window
 	// (from top left to bottom right)
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, width, height);
 
+
+	// Initialise the shaders
 	Shader shaderProgram("default.vert", "default.frag");
 	
+	// Bind the Vertex Array Object to OpenGL
 	VAO VAO1;
 	VAO1.Bind();
 
+	// Initialise a vertex buffer object and an element index buffer
 	VBO VBO1(vertices, sizeof(vertices));
 	EBO EBO1(indices, sizeof(indices));
 
+	// Link the different attributes, coords, colour, texture coords
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
-
+	// Unbind so they cannot be edited
+	// ORDER IMPORTANT
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
 
+	// Gets ID of uniform 'scale'
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
-	Texture popCat("pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+	// Initialise texture
+	Texture popCat("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	popCat.texUnit(shaderProgram, "tex0", 0);
+
+	float rotation = 0.0f;
+	double prevTime = glfwGetTime();
+
+	glEnable(GL_DEPTH_TEST);
 
 	// While window hasn't been closed
 	while (!glfwWindowShouldClose(window))
@@ -87,15 +113,43 @@ int main()
 		// Specify colour of background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean backbuffer and fill it with specified colour
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Specify shader program to use
 		shaderProgram.Activate();
+
+		double crntTime = glfwGetTime();
+		if (crntTime - prevTime >= 1.0f / 60.0f)
+		{
+			rotation += 0.5f;
+			prevTime = crntTime;
+		}
+
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 proj = glm::mat4(1.0f);
+		
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+		proj = glm::perspective(glm::radians(45.0f), (float)(height / width), 0.1f, 100.0f);
+
+		int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+		int projLoc = glGetUniformLocation(shaderProgram.ID, "proj");
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+
+
+		// Assigns value to the uniform, must be done after activation of shader
 		glUniform1f(uniID, 0.5f);
+		// Binds texture to appear in rendering
 		popCat.Bind();
 		// Bind VAO so OpenGL uses it
 		VAO1.Bind();
 		// Draw triangles using 9 vertices according to element array buffer
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0);
 		// Swap back and front buffer
 		glfwSwapBuffers(window);
 		// Take care of all glfw events
