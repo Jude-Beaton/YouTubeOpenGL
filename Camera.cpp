@@ -14,14 +14,18 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shade
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 
+	// calculate the matrices
 	view = glm::lookAt(Position, Position + Orientation, Up);
 	projection = glm::perspective(glm::radians(FOVdeg), (float)width / (float)height, nearPlane, farPlane);
 
+
+	// pass the projected points to the shader
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projection * view));
 }
 
 void Camera::Inputs(GLFWwindow* window)
 {
+	// Handle keyboard and mouse input
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		Position += speed * Orientation;
@@ -57,13 +61,18 @@ void Camera::Inputs(GLFWwindow* window)
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
+
+		// Hide the cursor
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+		// Prevent the camera from jerking when mouse clicked
 		if (firstClick) {
 			glfwSetCursorPos(window, (double)width / 2, (double)height / 2);
 			firstClick = false;
 		}
 
+
+		// Rotate camera 
 		double mouseX;
 		double mouseY;
 		glfwGetCursorPos(window, &mouseX, &mouseY);
@@ -73,12 +82,15 @@ void Camera::Inputs(GLFWwindow* window)
 
 		glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotx), glm::normalize(glm::cross(Orientation, Up)));
 
+		// Prevent camera from turning beyond 180 degrees vertically
 		if (!(glm::angle(newOrientation, Up) <= glm::radians(5.0f) or glm::angle(newOrientation, -Up) <= glm::radians(5.0f))) {
 			Orientation = newOrientation;
 		}
 
+		// Set cameras new orientation
 		Orientation = glm::rotate(Orientation, glm::radians(-roty), Up);
 
+		// Reset cursor to middle of screen
 		glfwSetCursorPos(window, (double)width / 2, (double)height / 2);
 
 	}
