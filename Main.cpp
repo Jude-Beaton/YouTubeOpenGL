@@ -19,24 +19,38 @@ const unsigned int height = 720;
 // Array of vertices for the equilateral triangles
 GLfloat vertices[] =
 {
-	//   COORDINATES	   /			COLOURS			/	TEXTURE COORDS
-	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,		
-	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,		
-	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,		
-	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,		
-	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,		
-
+//		COORDINATES			/		COLOURS				/	TEXCOORD		/			NORMALS
+	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
+	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 5.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
+	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 5.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
+	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
+	
+	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			-0.8f,  0.5f,  0.0f,	// Left
+	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			-0.8f,  0.5f,  0.0f,	// Left
+	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			-0.8f,  0.5f,  0.0f,	// Left
+	
+	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.0f,  0.5f, -0.8f,	// Back
+	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.0f,  0.5f, -0.8f,	// Back
+	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			 0.0f,  0.5f, -0.8f,	// Back
+	
+	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.8f,  0.5f,  0.0f,	// Right
+	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.8f,  0.5f,  0.0f,	// Right
+	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			 0.8f,  0.5f,  0.0f,	// Right
+	
+	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.0f,  0.5f,  0.8f,	// Front
+	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.0f,  0.5f,  0.8f,	// Front
+	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			 0.0f,  0.5f,  0.8f,	// Front
 };
 
 // Indices representing each triangle
 GLuint indices[] =
 {
-	0, 1, 2,
-	0, 2, 3,
-	0, 1, 4,
-	1, 2, 4,
-	2, 3, 4,
-	3, 0, 4,
+	 0,  1,  2,
+	 0,  2,  3,
+	 4,  6,  5,
+	 7,  9,  8,
+	10, 12, 11,
+	13, 15, 14,
 };  
 
 GLfloat lightVertices[] =
@@ -113,9 +127,10 @@ int main()
 	EBO EBO1(indices, sizeof(indices));
 
 	// Link the different attributes, coords, colour, texture coords
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
 
 	// Unbind so they cannot be edited
 	// ORDER IMPORTANT
@@ -154,6 +169,7 @@ int main()
 	shaderProgram.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
 	
 
@@ -191,7 +207,7 @@ int main()
 		//	prevTime = crntTime;
 		//}
 
-		//glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 
 		// Rotate the model matrix
 		//model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -207,6 +223,7 @@ int main()
 
 		// Specify shader program to use
 		shaderProgram.Activate();
+		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(shaderProgram, "camMatrix");
 
 
