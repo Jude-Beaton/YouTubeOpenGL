@@ -16,6 +16,8 @@
 const unsigned int width = 1080;
 const unsigned int height = 720;
 
+const float rotationSpeed = 0.0f;
+
 // Array of vertices for the equilateral triangles
 GLfloat vertices[] =
 {
@@ -153,7 +155,7 @@ int main()
 	lightEBO.Unbind();
 
 
-	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::vec4 lightColor = glm::vec4(1.0f, 0.5f, 1.0f, 1.0f);
 
 	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
@@ -177,11 +179,11 @@ int main()
 	Texture popCat("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	popCat.texUnit(shaderProgram, "tex0", 0);
 
-	//// Variable to store rotation of object
-	//float rotation = 0.0f;
+	// Variable to store rotation of object
+	float rotation = 0.0f;
 
-	//// Variable to store time of last roation made
-	//double prevTime = glfwGetTime();
+	// Variable to store time of last roation made
+	double prevTime = glfwGetTime();
 
 	// Turn on depth testing for the faces drawn of the object
 	glEnable(GL_DEPTH_TEST);
@@ -200,21 +202,16 @@ int main()
 		
 
 
-		//double crntTime = glfwGetTime();
-		//if (crntTime - prevTime >= 1.0f / 60.0f)
-		//{
-		//	rotation += 0.5f;
-		//	prevTime = crntTime;
-		//}
+		double crntTime = glfwGetTime();
+		if (crntTime - prevTime >= 1.0f / 60.0f)
+		{
+			rotation += rotationSpeed;
+			prevTime = crntTime;
+		}
 
 		glm::mat4 model = glm::mat4(1.0f);
 
-		// Rotate the model matrix
-		//model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-		// Pass the matrices into the shader using the uniforms
-		//int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		
 
 		// Recieve inputs
 		camera.Inputs(window);
@@ -223,6 +220,14 @@ int main()
 
 		// Specify shader program to use
 		shaderProgram.Activate();
+
+		// Rotate the model matrix
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		// Pass the matrices into the shader using the uniforms
+		int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
 		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(shaderProgram, "camMatrix");
 
