@@ -11,7 +11,9 @@ in vec2 texCoord;
 // Gets Texture unit from main function
 uniform sampler2D tex0;
 
+uniform vec4 lightColor;
+
 void main()
 {
-   FragColor = texture(tex0, texCoord);
+   FragColor = texture(tex0, texCoord) * lightColor;
 }

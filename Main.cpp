@@ -39,6 +39,34 @@ GLuint indices[] =
 	3, 0, 4,
 };  
 
+GLfloat lightVertices[] =
+{
+	-0.1f, -0.1f,   0.1f,
+	-0.1f, -0.1f,  -0.1f,
+	 0.1f, -0.1f,  -0.1f,
+	 0.1f, -0.1f,   0.1f,
+	-0.1f,  0.1f,   0.1f,
+	-0.1f,  0.1f,  -0.1f,
+	 0.1f,  0.1f,  -0.1f,
+	 0.1f,  0.1f,   0.1f,
+};
+
+GLuint lightIndices[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 4, 7,
+	0, 7, 3,
+	3, 7, 6,
+	3, 6, 2,
+	2, 6, 5,
+	2, 5, 1,
+	1, 5, 4,
+	1, 4, 0,
+	4, 5, 6,
+	4, 6, 7,
+};
+
 
 int main() 
 {
@@ -95,15 +123,49 @@ int main()
 	VBO1.Unbind();
 	EBO1.Unbind();
 
+	Shader lightShader("light.vert", "light.frag");
+
+	VAO lightVAO;
+	lightVAO.Bind();
+
+	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	EBO lightEBO(lightIndices, sizeof(lightIndices));
+
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+	lightVAO.Unbind();
+	lightVBO.Unbind();
+	lightEBO.Unbind();
+
+
+	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 lightModel = glm::mat4(1.0f);
+	lightModel = glm::translate(lightModel, lightPos);
+	
+	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::mat4 pyramidModel = glm::mat4(1.0f);
+	pyramidModel = glm::translate(pyramidModel, pyramidPos);
+
+	lightShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	shaderProgram.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+
+	
+
 	// Initialise texture
 	Texture popCat("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	popCat.texUnit(shaderProgram, "tex0", 0);
 
-	// Variable to store rotation of object
-	float rotation = 0.0f;
+	//// Variable to store rotation of object
+	//float rotation = 0.0f;
 
-	// Variable to store time of last roation made
-	double prevTime = glfwGetTime();
+	//// Variable to store time of last roation made
+	//double prevTime = glfwGetTime();
 
 	// Turn on depth testing for the faces drawn of the object
 	glEnable(GL_DEPTH_TEST);
@@ -119,29 +181,33 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean backbuffer and fill it with specified colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Specify shader program to use
-		shaderProgram.Activate();
+		
 
-		double crntTime = glfwGetTime();
-		if (crntTime - prevTime >= 1.0f / 60.0f)
-		{
-			rotation += 0.5f;
-			prevTime = crntTime;
-		}
 
-		glm::mat4 model = glm::mat4(1.0f);
+		//double crntTime = glfwGetTime();
+		//if (crntTime - prevTime >= 1.0f / 60.0f)
+		//{
+		//	rotation += 0.5f;
+		//	prevTime = crntTime;
+		//}
+
+		//glm::mat4 model = glm::mat4(1.0f);
 
 		// Rotate the model matrix
-		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		// Pass the matrices into the shader using the uniforms
-		int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 		// Recieve inputs
 		camera.Inputs(window);
 		// Convert coords to the projection
-		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+		camera.updateMatrix(45.0f, 0.1f, 100.0f);
+
+		// Specify shader program to use
+		shaderProgram.Activate();
+		camera.Matrix(shaderProgram, "camMatrix");
 
 
 		// Binds texture to appear in rendering
@@ -150,6 +216,13 @@ int main()
 		VAO1.Bind();
 		// Draw triangles using 9 vertices according to element array buffer
 		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0);
+		
+		lightShader.Activate();
+		camera.Matrix(lightShader, "camMatrix");
+		lightVAO.Bind();
+		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+
 		// Swap back and front buffer
 		glfwSwapBuffers(window);
 		// Take care of all glfw events
