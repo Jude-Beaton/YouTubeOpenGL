@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType) {
+Texture::Texture(const char* image, GLenum texType, GLuint slot, GLenum format, GLenum pixelType) {
 	
 	// Assigns the type of texture object
 	type = texType;
@@ -15,13 +15,14 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 	// Create an OpenGL texture object
 	glGenTextures(1, &ID);
 	// Assign tecture to a texture unit
-	glActiveTexture(slot);
+	glActiveTexture(GL_TEXTURE0 + slot);
+	unit = slot;
 	glBindTexture(texType, ID);
 
 	// Configures the algorithm used to scale the texture
 	// GL_NEAREST - Pixelates
 	// GL_LINEAR  - Interpolates
-	glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 	glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
@@ -57,6 +58,7 @@ void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit)
 
 void Texture::Bind()
 {
+	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(type, ID);
 }
 

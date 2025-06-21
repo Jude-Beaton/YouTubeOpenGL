@@ -21,27 +21,12 @@ const float rotationSpeed = 0.0f;
 // Array of vertices for the equilateral triangles
 GLfloat vertices[] =
 {
-//		COORDINATES			/		COLOURS				/	TEXCOORD		/			NORMALS
-	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
-	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 5.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
-	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 5.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
-	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.0f, -1.0f,  0.0f,	// Bottom
+//		COORDINATES			/		COLOURS			/	TEXCOORD		/			NORMALS
+	-1.0f,  0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,			 0.0f,  1.0f,  0.0f,
+	-1.0f,  0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,			 0.0f,  1.0f,  0.0f,
+	 1.0f,  0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,			 0.0f,  1.0f,  0.0f,
+	 1.0f,  0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,			 0.0f,  1.0f,  0.0f,
 	
-	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			-0.8f,  0.5f,  0.0f,	// Left
-	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			-0.8f,  0.5f,  0.0f,	// Left
-	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			-0.8f,  0.5f,  0.0f,	// Left
-	
-	-0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.0f,  0.5f, -0.8f,	// Back
-	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.0f,  0.5f, -0.8f,	// Back
-	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			 0.0f,  0.5f, -0.8f,	// Back
-	
-	 0.5f,  0.0f, -0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.8f,  0.5f,  0.0f,	// Right
-	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.8f,  0.5f,  0.0f,	// Right
-	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			 0.8f,  0.5f,  0.0f,	// Right
-	
-	 0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		5.0f, 0.0f,			 0.0f,  0.5f,  0.8f,	// Front
-	-0.5f,  0.0f,  0.5f,		0.83f, 0.70f, 0.44f,		0.0f, 0.0f,			 0.0f,  0.5f,  0.8f,	// Front
-	 0.0f,  0.8f,  0.0f,		0.92f, 0.86f, 0.76f,		2.5f, 5.0f,			 0.0f,  0.5f,  0.8f,	// Front
 };
 
 // Indices representing each triangle
@@ -49,10 +34,6 @@ GLuint indices[] =
 {
 	 0,  1,  2,
 	 0,  2,  3,
-	 4,  6,  5,
-	 7,  9,  8,
-	10, 12, 11,
-	13, 15, 14,
 };  
 
 GLfloat lightVertices[] =
@@ -155,7 +136,7 @@ int main()
 	lightEBO.Unbind();
 
 
-	glm::vec4 lightColor = glm::vec4(1.0f, 0.5f, 1.0f, 1.0f);
+	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
@@ -176,8 +157,10 @@ int main()
 	
 
 	// Initialise texture
-	Texture popCat("brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	popCat.texUnit(shaderProgram, "tex0", 0);
+	Texture planksTex("planks.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	planksTex.texUnit(shaderProgram, "tex0", 0);
+	Texture planksSpec("planksSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
+	planksSpec.texUnit(shaderProgram, "tex1", 1);
 
 	// Variable to store rotation of object
 	float rotation = 0.0f;
@@ -233,7 +216,8 @@ int main()
 
 
 		// Binds texture to appear in rendering
-		popCat.Bind();
+		planksTex.Bind();
+		planksSpec.Bind();
 		// Bind VAO so OpenGL uses it
 		VAO1.Bind();
 		// Draw triangles using 9 vertices according to element array buffer
@@ -255,8 +239,14 @@ int main()
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-	popCat.Delete();
+	planksTex.Delete();
+	planksSpec.Delete();
 	shaderProgram.Delete();
+
+	lightVAO.Delete();
+	lightVBO.Delete();
+	lightEBO.Delete();
+	lightShader.Delete();
 
 	// Destroy window and terminate glfw before closing
 	glfwDestroyWindow(window);
