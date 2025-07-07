@@ -30,7 +30,7 @@ vec4 pointLight()
    float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
 
 
-   float ambient = 0.20f;
+   float ambient = 1.50f;
 
    vec3 normal = normalize(Normal);
    vec3 lightDirection = normalize(lightVec);

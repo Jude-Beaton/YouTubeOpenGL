@@ -21,17 +21,20 @@ out vec2 texCoord;
 
 uniform mat4 camMatrix;
 uniform mat4 model;
+uniform mat4 translation;
+uniform mat4 rotation;
+uniform mat4 scale;
 
 
 void main()
 {
-   crntPos = vec3(model * vec4(aPos, 1.0f));
+   crntPos = vec3(model * translation * -rotation * scale * vec4(aPos, 1.0f));
 
    Normal = vec3(model * vec4(aNormal, 1.0f));
    // Assigns the colours from the Vertex Data to "color"
    color = aColor;
    // Assigns the texture coordinates from the Vertex Data to "texCoord"
-   texCoord = aTex;
+   texCoord = mat2(0.0f, -1.0f, 1.0f, 0.0f) * aTex;
    
    // Outputs the positions/coordinates of vertices
    gl_Position = camMatrix * vec4(crntPos, 1.0);
